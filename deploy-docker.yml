@@ -1,5 +1,5 @@
 ---
-- hosts: dev
+- hosts: dockermaster
   become: True
   tasks:
     - name: Install python pip
