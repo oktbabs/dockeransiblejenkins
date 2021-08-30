@@ -1,0 +1,21 @@
+---
+# tasks file for logstash
+
+Install and Configure Logstash
+
+- name: Download Kibana 6.2.4 and then you should install it using the rpm command
+  get_url:
+    url: https://artifacts.elastic.co/downloads/logstash/logstash-6.2.4.rpm
+    dest: /home/oracle
+    mode: '0640'
+
+- name: Install logstash-6.2.4.rpm
+  yum: 
+    name: logstash-6.2.4.rpm
+    state: installed
+
+- name: Add logstash to run at the boot time and start Nginx
+  systemd:
+    name: logstash      
+    state: started
+    enabled: yes

@@ -1,0 +1,75 @@
+---
+# tasks file for elasticsearch
+
+
+- name: Ensure SELinux is set to disabled mode
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=disabled
+
+- name: Download JAVA 8
+  get_url:
+    url: http://download.oracle.com/otn-pub/java/jdk/8u77-b02/jdk-8u171-linux-x64.rpm
+    dest: /home/oracle
+    mode: '0640'
+
+- name: Install JAVA 8
+  yum: 
+    name: jdk-8u171-linux-x64.rpm
+    state: installed
+
+
+- name: Install and Configure Elasticsearch on CentOS 7 - Import PGP Keys
+  rpm_key:
+    state: present
+    key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+- name: Download Elasticsearch 6.2 and initiate the installation
+  get_url:
+    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.4.rpm
+    dest: /home/oracle
+    mode: '0640'
+
+- name: Install elasticsearch-6.2.4.rpm
+  yum: 
+    name: elasticsearch-6.2.4.rpm
+    state: installed
+
+
+- name: Edit the elasticsearch.yml configuration file - Enable the memory lock for Elasticsearch
+  lineinfile:
+    dest: /etc/elasticsearch/elasticsearch.yml
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^bootstrap.memory_lock', line: 'bootstrap.memory_lock: true' }
+    - { regexp: '^network.host', line: 'network.host: localhost' }
+    - { regexp: '^http.port', line: 'http.port: 9200' }
+
+
+
+- name: Edit the elasticsearch.service file for the configuration of the memory lock
+  lineinfile:
+    path: /usr/lib/systemd/system/elasticsearch.service
+    regexp: '^LimitMEMLOCK='
+    line: LimitMEMLOCK=infinity
+
+- name: Edit the sysconfig configuration file for Elasticsearch
+  lineinfile:
+    path: /etc/sysconfig/elasticsearch
+    regexp: '^MAX_LOCKED_MEMORY='
+    line: MAX_LOCKED_MEMORY=unlimited
+
+
+- name: Reload systems
+  systemd: daemon_reload=yes
+
+- name: enable Elasticsearch to start at boot time
+  systemd:
+    name: elasticsearch
+    state: started
+    enabled: yes
+ 
+
+

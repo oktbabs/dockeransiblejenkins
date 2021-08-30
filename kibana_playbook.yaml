@@ -1,0 +1,9 @@
+- hosts: appservers
+  become: yes
+  roles:
+    - gen-dependencies
+    - package-update
+    - elasticsearch
+    - nginx
+    - kibana 
+    - logstash 

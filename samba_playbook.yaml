@@ -1,0 +1,6 @@
+- hosts: all
+  become: yes
+  roles:
+    - gen-dependencies
+    - smb-packages
+  
