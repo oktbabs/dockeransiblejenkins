@@ -1,0 +1,18 @@
+# This is the default ansible 'hosts' file.
+
+# Ex 1: Ungrouped hosts, specify before any group headers.
+
+[ansiblecontroller]
+192.168.10.111	ansible_user=jenkins
+192.168.10.250  ansible_user=oracle
+
+[jenkinserver]
+#192.168.10.111
+
+[kuberneteservers]
+192.168.10.85   ansible_user=oracle
+192.168.10.86    
+
+#[otdservers]
+#192.168.10.107   ansible_user=oracle
+
