@@ -1,0 +1,37 @@
+---
+# tasks file for gen-dependencies
+
+- name: Disable firewall services
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+#
+- name: Install yum packages
+  yum: 
+    name: "*"
+    state: present
+    update_cache: yes
+
+- name: Install epel-release
+  yum:
+    name: [ 'epel-release', 'expect' ] 
+    state: installed
+
+- name: Install other dependencies
+  yum:
+    name: [ 'ntp', 'ntpdate', 'wget', 'httpd', 'git', 'php', 'php-json',  'php-xml', 'php-common' ] 
+    state: present
+#  with_items:
+#    - ntpd
+#    - ntpdate
+#    - wget
+    
+- name: Install other dependencies
+  shell: |
+    ntpdate -u -s 0.centos.pool.ntp.org 1.centos.pool.ntp.org 2.centos.pool.ntp.org
+    hwclock -w

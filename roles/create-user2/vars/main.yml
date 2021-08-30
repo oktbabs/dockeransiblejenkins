@@ -1,0 +1,6 @@
+---
+# vars file for create-user2
+#- name : Gatting all credentials variables
+#  vars:
+uusername: oracle
+upassword: Kala8Kuta

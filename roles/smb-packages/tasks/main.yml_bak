@@ -1,0 +1,91 @@
+---
+- name: Unmount a mounted volume
+  mount:
+    path: /linux_orasoft
+    state: unmounted
+
+- name: Create a directory /linux_orasoft if it does not exist
+  file:
+    path: /linux_orasoft 
+    state: directory
+    mode: '0755'
+
+- name: Ensure group "oinstall" exists
+  group:
+    name: oinstall
+    state: present
+
+- name: Recursively change ownership of /linux_orasoft directory
+  file:
+    path: /linux_orasoft 
+    state: directory
+    recurse: yes
+    owner: oracle
+    group: oinstall
+
+- name: Copy "/etc/samba/smb.conf to /etc/samba/smb.conf.original, backing up the original" 
+  copy:
+    src: /etc/samba/smb.conf
+    dest: /etc/samba/smb.conf.original
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+
+- name: Insert/Update linux_orasoft configuration block in smb.conf
+  blockinfile:
+    path: /etc/samba/smb.conf
+    block: |
+      [linux_orasoft]
+              comment = Shared Files
+              path = /linux_orasoft
+              browsable = yes
+              read only = no
+
+- name: Create user
+  user: name=timmy shell=/sbin/nologin groups=oinstall generate_ssh_key=yes ssh_key_bits=2048
+- name: Set password to user
+  shell: echo timmy:Kala8Kuta | sudo chpasswd
+  no_log: True
+
+- name: Create /root/smb.cred file
+  file: 
+    path: /root/smb.cred
+    state: touch
+    owner: oracle
+    group: oinstall
+    mode: 0755
+
+- name: Insert/Update User credential configuration block in /root/smb.cred
+  blockinfile:
+    path: /root/smb.cred
+    block: |
+      username=timmy
+      password=Kala8Kuta
+      force user = oracle
+      force group = oinstall
+
+- name: Make changes to the host machine
+  set_fact:
+    host1: lablantech
+#    host1: "{{ ansible_default_ipv4.address }}"
+
+- name: Create fstab entry for product image folder share
+  mount: 
+    state: present 
+    fstype: cifs 
+    opts: 'credentials=/root/smb.cred,vers=3.0,rw,soft,uid=oracle,gid=oinstall,file_mode=0770,dir_mode=0770 0 0'
+    src: '//{{ host1 }}/LINUX_ORASOFT' 
+#`    src: '//{{ ansible_default_ipv4.address }}/LINUX_ORASOFT' 
+    path: /linux_orasoft
+  become: true
+
+
+- name: Mount a linux filesystem on Windows share
+  mount:
+    path: /linux_orasoft
+    src: '//{{ host1 }}/LINUX_ORASOFT'
+#    src: '//{{ ansible_default_ipv4.address }}/LINUX_ORASOFT'
+    opts: 'credentials=/root/smb.cred,vers=3.0,rw,soft,uid=oracle,gid=oinstall,file_mode=0770,dir_mode=0770'
+    state: mounted
+    fstype: cifs

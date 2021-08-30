@@ -1,0 +1,31 @@
+---
+# tasks file for linux_dash-monitor
+
+- name: Install other dependencies
+  yum:
+    name: [ 'httpd', 'git', 'php', 'php-json',  'php-xml', 'php-common' ]
+    state: present
+
+- name: Make sure a service is running
+  systemd:
+    state: started
+    name: httpd
+        
+- name: Clone a private repository into /var/www/html
+  git:
+    repo: https://github.com/afaqurk/linux-dash.git
+    version: master
+    dest: /var/www/html
+
+- name: Restart service httpd on centos, in all cases, also issue daemon-reload to pick up config changes
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: httpd
+
+- name: Enable service httpd and ensure it is not masked
+  systemd:
+    name: httpd
+    enabled: yes
+    masked: no
+

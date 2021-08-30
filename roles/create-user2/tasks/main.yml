@@ -1,0 +1,55 @@
+---
+# tasks file for create-user2
+- name: Generate password for new user
+  shell: mkpasswd --chars 20
+  register: user_password
+
+- name: Generate encrypted password
+  shell: mkpasswd --method=SHA-512 {{ user_password.stdout }}
+  register: encrypted_user_password
+
+- name: Create user account
+  user: name={{ new_user_name }}
+        password={{ encrypted_user_password.stdout }}
+        state=present
+        append=yes
+        shell="/bin/bash"
+        update_password=always
+  when: new_user_name is defined and new_user_name in uids
+  register: user_created
+
+- name: Force user to change password
+  shell: chage -d 0 {{ new_user_name }}
+  when: user_created.changed
+
+- name: User created
+  debug: msg="Password for {{ new_user_name }} is {{ user_password.stdout }}"
+  when: user_created.changed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

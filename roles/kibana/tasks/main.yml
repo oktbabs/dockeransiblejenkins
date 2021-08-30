@@ -1,0 +1,30 @@
+---
+# tasks file for kibana
+
+- name: Download Kibana 6.2.4 and then you should install it using the rpm command
+  get_url:
+    url: https://artifacts.elastic.co/downloads/kibana/kibana-6.2.4-x86_64.rpm
+    dest: /home/oracle
+    mode: '0640'
+
+- name: Install kibana-6.2.4-x86_64.rpm
+  yum: 
+    name: kibana-6.2.4-x86_64.rpm
+    state: installed
+
+- name: Editing the Kibana configuration file
+  lineinfile:
+    dest: /etc/kibana/kibana.yml
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^server.port', line: 'server.port: 5601' }
+    - { regexp: '^server.host', line: 'server.host: "localhost"' }
+    - { regexp: '^elasticsearch.url', line: 'elasticsearch.url: "http://localhost:9200"' }
+
+- name: Start the Kibana service enable it to start at boot time
+  systemd:
+    name: kibana
+    state: started
+    enabled: yes
+

@@ -1,0 +1,19 @@
+---
+# tasks file for create-user
+#tasks:
+- name: create oracle user
+  user: 
+    name: oracle 
+    createhome: yes 
+    shell: /bin/bash 
+    groups: oinstall,jenkins,docker,dba,ansible
+    generate_ssh_key: yes 
+    ssh_key_bits: 2048
+    state: present 
+  register: newuser
+
+- name: generate random password for oracle only on creation
+  shell: echo oracle:Kala8Kuta | sudo chpasswd
+#  shell: /usr/bin/openssl rand -base64 32 | passwd --stdin oracle
+  when: newuser.changed
+
