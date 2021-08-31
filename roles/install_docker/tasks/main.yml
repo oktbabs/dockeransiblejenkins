@@ -6,7 +6,7 @@
     become: yes
 - name: "Installing Docker Prerequisite packages"
   yum:
-  name: "{{ item }}"
+    name: "{{ item }}"
     state: latest
     with_items:
     - yum-utils
