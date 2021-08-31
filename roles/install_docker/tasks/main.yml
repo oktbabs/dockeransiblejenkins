@@ -1,9 +1,9 @@
 ---
 # tasks file for install_docker
 - name: "Installing Docker Prerequisite packages"
-  tasks:
-    user: oracle
-    become: yes
+  user: oracle
+  become: yes
+#  tasks:
 - name: "Installing Docker Prerequisite packages"
   yum:
     name: "{{ item }}"
