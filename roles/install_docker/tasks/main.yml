@@ -1,6 +1,6 @@
 ---
 # tasks file for install_docker
-user: ansible
+user: oracle
 become: yes
 tasks:
 - name: "Installing Docker Prerequisite packages"
