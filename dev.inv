@@ -1,2 +1,2 @@
 [dockermaster]
-192.168.10.180  ansible_user=oracle
+192.168.10.80  ansible_user=oracle
